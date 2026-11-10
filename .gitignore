@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+coverage.xml
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Secrets et configuration locale (ne jamais pousser)
+.env
+*.pem
+*.key
+id_ed25519*
+
+# Éditeurs / système
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
