@@ -1,0 +1,1 @@
+"""Routes métier du service Colis."""
