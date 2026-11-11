@@ -70,14 +70,26 @@ def test_duplicate_email_and_phone_conflict(client):
 
 
 def test_bad_credentials_inactive_user_and_invalid_token(client):
-    assert client.post("/auth/login", json={"email": "nobody@example.com", "mot_de_passe": "bad"}).status_code == 401
+    response = client.post(
+        "/auth/login",
+        json={"email": "nobody@example.com", "mot_de_passe": "bad"},
+    )
+    assert response.status_code == 401
     register(client)
-    assert client.post("/auth/login", json={"email": "client@example.com", "mot_de_passe": "wrong-password"}).status_code == 401
+    response = client.post(
+        "/auth/login",
+        json={"email": "client@example.com", "mot_de_passe": "wrong-password"},
+    )
+    assert response.status_code == 401
     with SessionLocal() as db:
         user = db.query(User).filter_by(email="client@example.com").one()
         user.actif = False
         db.commit()
-    assert client.post("/auth/login", json={"email": "client@example.com", "mot_de_passe": "MotDePasse123!"}).status_code == 401
+    response = client.post(
+        "/auth/login",
+        json={"email": "client@example.com", "mot_de_passe": "MotDePasse123!"},
+    )
+    assert response.status_code == 401
     assert client.get("/auth/me", headers={"Authorization": "Bearer invalid"}).status_code == 401
     assert client.get("/users").status_code == 401
 
@@ -91,7 +103,11 @@ def test_admin_manages_roles_and_client_is_forbidden(client):
     assert result.status_code == 200
     assert result.json()["role"] == "livreur"
     assert client.patch(f"/users/{uuid4()}/role", headers=headers, json={"role": "client"}).status_code == 404
-    user_token = client.post("/auth/login", json={"email": "client@example.com", "mot_de_passe": "MotDePasse123!"}).json()["access_token"]
+    login = client.post(
+        "/auth/login",
+        json={"email": "client@example.com", "mot_de_passe": "MotDePasse123!"},
+    )
+    user_token = login.json()["access_token"]
     assert client.get("/users", headers={"Authorization": f"Bearer {user_token}"}).status_code == 403
 
 

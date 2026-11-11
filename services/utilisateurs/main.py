@@ -12,7 +12,21 @@ from argon2.exceptions import InvalidHash, VerificationError
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
-from sqlalchemy import Boolean, CheckConstraint, DateTime, Enum as SAEnum, Float, ForeignKey, String, Text, Uuid, create_engine, func, select, text
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    Enum as SAEnum,
+    Float,
+    ForeignKey,
+    String,
+    Text,
+    Uuid,
+    create_engine,
+    func,
+    select,
+    text,
+)
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 
@@ -70,7 +84,11 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     telephone: Mapped[str | None] = mapped_column(String(30), unique=True)
     mot_de_passe_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[UserRole] = mapped_column(SAEnum(UserRole, name="user_role", values_callable=enum_values), nullable=False, default=UserRole.CLIENT)
+    role: Mapped[UserRole] = mapped_column(
+        SAEnum(UserRole, name="user_role", values_callable=enum_values),
+        nullable=False,
+        default=UserRole.CLIENT,
+    )
     actif: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
@@ -81,12 +99,21 @@ class Parcel(Base):
 
     id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True)
     reference: Mapped[str] = mapped_column(String(40), unique=True, nullable=False)
-    client_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("utilisateurs.id", ondelete="RESTRICT"), nullable=False, index=True)
+    client_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("utilisateurs.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
     description: Mapped[str] = mapped_column(Text, nullable=False)
     poids_kg: Mapped[float] = mapped_column(Float, nullable=False)
     adresse_depart: Mapped[str] = mapped_column(String(255), nullable=False)
     adresse_arrivee: Mapped[str] = mapped_column(String(255), nullable=False)
-    statut: Mapped[ParcelStatus] = mapped_column(SAEnum(ParcelStatus, name="parcel_status", values_callable=enum_values), nullable=False, default=ParcelStatus.EN_ATTENTE)
+    statut: Mapped[ParcelStatus] = mapped_column(
+        SAEnum(ParcelStatus, name="parcel_status", values_callable=enum_values),
+        nullable=False,
+        default=ParcelStatus.EN_ATTENTE,
+    )
     cree_le: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
 
@@ -94,10 +121,25 @@ class Delivery(Base):
     __tablename__ = "livraisons"
 
     id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True)
-    colis_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), ForeignKey("colis.id", ondelete="RESTRICT"), nullable=False, index=True)
-    livreur_id: Mapped[UUID | None] = mapped_column(Uuid(as_uuid=True), ForeignKey("utilisateurs.id", ondelete="SET NULL"), index=True)
-    statut: Mapped[DeliveryStatus] = mapped_column(SAEnum(DeliveryStatus, name="delivery_status", values_callable=enum_values), nullable=False, default=DeliveryStatus.AFFECTEE)
-    date_affectation: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    colis_id: Mapped[UUID] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("colis.id", ondelete="RESTRICT"),
+        nullable=False,
+        index=True,
+    )
+    livreur_id: Mapped[UUID | None] = mapped_column(
+        Uuid(as_uuid=True),
+        ForeignKey("utilisateurs.id", ondelete="SET NULL"),
+        index=True,
+    )
+    statut: Mapped[DeliveryStatus] = mapped_column(
+        SAEnum(DeliveryStatus, name="delivery_status", values_callable=enum_values),
+        nullable=False,
+        default=DeliveryStatus.AFFECTEE,
+    )
+    date_affectation: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
     date_livraison: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     commentaire: Mapped[str | None] = mapped_column(Text)
 
@@ -273,7 +315,12 @@ def list_users(db: Session = Depends(get_db), _: User = Depends(require_roles(Us
 
 
 @app.patch("/users/{user_id}/role", response_model=UserOut, tags=["utilisateurs"])
-def update_role(user_id: UUID, data: RoleUpdate, db: Session = Depends(get_db), _: User = Depends(require_roles(UserRole.ADMINISTRATEUR.value))):
+def update_role(
+    user_id: UUID,
+    data: RoleUpdate,
+    db: Session = Depends(get_db),
+    _: User = Depends(require_roles(UserRole.ADMINISTRATEUR.value)),
+):
     user = db.get(User, user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="Utilisateur introuvable")
