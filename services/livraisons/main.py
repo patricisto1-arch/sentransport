@@ -1,10 +1,9 @@
-"""Service Livraisons - SenTransport.
-
-Squelette : ajoutez vos routes ici en suivant docs/contrats-api.md.
-"""
+"""Service Livraisons - SenTransport."""
 import os
 
 from fastapi import FastAPI
+
+from routes import router
 
 app = FastAPI(title="SenTransport - Service Livraisons")
 
@@ -16,3 +15,6 @@ JWT_SECRET = os.getenv("JWT_SECRET", "")
 def health():
     """Utilisé par docker-compose et le déploiement pour vérifier l'état du service."""
     return {"status": "ok", "service": "livraisons"}
+
+
+app.include_router(router)
