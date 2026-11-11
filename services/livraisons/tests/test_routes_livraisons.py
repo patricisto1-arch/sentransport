@@ -44,7 +44,7 @@ def livraison_existante(monkeypatch, **changes):
 # --- GET / ---
 
 def test_lister_ok(monkeypatch):
-    monkeypatch.setattr(database, "lister_livraisons", lambda l, s: [LIV])
+    monkeypatch.setattr(database, "lister_livraisons", lambda liv, s: [LIV])
     r = client.get("/", headers=en_tete("client"))
     assert r.status_code == 200
     assert r.json()[0]["id"] == 7
@@ -53,8 +53,8 @@ def test_lister_ok(monkeypatch):
 def test_lister_filtres(monkeypatch):
     recu = {}
 
-    def faux(l, s):
-        recu["args"] = (l, s)
+    def faux(liv, s):
+        recu["args"] = (liv, s)
         return []
 
     monkeypatch.setattr(database, "lister_livraisons", faux)

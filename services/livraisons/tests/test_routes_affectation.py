@@ -33,7 +33,7 @@ def en_tete(role="admin"):
 
 def test_affectation_ok(monkeypatch):
     monkeypatch.setattr(colis_client, "colis_existe", lambda cid, tok: True)
-    monkeypatch.setattr(database, "creer_livraison", lambda c, l: LIVRAISON)
+    monkeypatch.setattr(database, "creer_livraison", lambda c, liv: LIVRAISON)
     r = client.post("/", json=DONNEES, headers=en_tete())
     assert r.status_code == 201
     assert r.json()["id"] == 7
@@ -77,7 +77,7 @@ def test_affectation_colis_refuse(monkeypatch):
 def test_affectation_deja_affecte(monkeypatch):
     monkeypatch.setattr(colis_client, "colis_existe", lambda cid, tok: True)
 
-    def doublon(c, l):
+    def doublon(c, liv):
         raise database.DejaAffecte(c)
     monkeypatch.setattr(database, "creer_livraison", doublon)
     assert client.post("/", json=DONNEES, headers=en_tete()).status_code == 409
