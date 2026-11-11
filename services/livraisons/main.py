@@ -1,15 +1,16 @@
-"""Service Livraisons - SenTransport.
-
-Squelette : ajoutez vos routes ici en suivant docs/contrats-api.md.
-"""
+"""Service Livraisons - SenTransport."""
 import os
 
 from fastapi import FastAPI
+
+from routes import router
 
 app = FastAPI(title="SenTransport - Service Livraisons")
 
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 JWT_SECRET = os.getenv("JWT_SECRET", "")
+
+app.include_router(router)
 
 
 @app.get("/health")
