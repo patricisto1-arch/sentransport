@@ -93,7 +93,46 @@ CREATE INDEX IF NOT EXISTS idx_historique_livraison_id
 CREATE INDEX IF NOT EXISTS idx_historique_date_changement
     ON historique_livraisons(date_changement);
 
--- 6. VERIFICATION DES TABLES
+-- 6. DONNÉES DE DÉMONSTRATION (mot de passe commun : Demo1234!).
+-- Le mot de passe est enregistré uniquement sous forme de hash Argon2id.
+INSERT INTO utilisateurs (nom, email, mot_de_passe_hash, role)
+VALUES
+    ('Client Démo', 'client.demo@sentransport.local',
+     '$argon2id$v=19$m=65536,t=3,p=4$sdOCCHkhMq50gML3IQzl4A$ZDqJP6VSQUPobypC8xfpLIpPKTw/sjCYw04onmexcgk', 'client'),
+    ('Livreur Démo', 'livreur.demo@sentransport.local',
+     '$argon2id$v=19$m=65536,t=3,p=4$sdOCCHkhMq50gML3IQzl4A$ZDqJP6VSQUPobypC8xfpLIpPKTw/sjCYw04onmexcgk', 'livreur'),
+    ('Administrateur Démo', 'admin.demo@sentransport.local',
+     '$argon2id$v=19$m=65536,t=3,p=4$sdOCCHkhMq50gML3IQzl4A$ZDqJP6VSQUPobypC8xfpLIpPKTw/sjCYw04onmexcgk', 'admin')
+ON CONFLICT (email) DO NOTHING;
+
+INSERT INTO colis (
+    expediteur_id, destinataire_nom, destinataire_adresse,
+    description, poids_kg, statut
+)
+SELECT u.id, 'Moussa Ndiaye', 'Rue 10, Pikine',
+       'Colis de démonstration', 2.50, 'en_attente'
+FROM utilisateurs AS u
+WHERE u.email = 'client.demo@sentransport.local'
+  AND NOT EXISTS (
+      SELECT 1 FROM colis AS c WHERE c.description = 'Colis de démonstration'
+  );
+
+INSERT INTO livraisons (colis_id, livreur_id, statut)
+SELECT c.id, u.id, 'en_attente'
+FROM colis AS c
+CROSS JOIN utilisateurs AS u
+WHERE c.description = 'Colis de démonstration'
+  AND u.email = 'livreur.demo@sentransport.local'
+  AND NOT EXISTS (SELECT 1 FROM livraisons AS l WHERE l.colis_id = c.id);
+
+INSERT INTO historique_livraisons (livraison_id, statut)
+SELECT l.id, l.statut
+FROM livraisons AS l
+WHERE NOT EXISTS (
+    SELECT 1 FROM historique_livraisons AS h WHERE h.livraison_id = l.id
+);
+
+-- 7. VERIFICATION DES TABLES
 SELECT table_name
 FROM information_schema.tables
 WHERE table_schema = 'public'
