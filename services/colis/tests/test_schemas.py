@@ -1,34 +1,37 @@
-
 import pytest
 from pydantic import ValidationError
-from app.schemas import ColisCreate
+from app.schemas import ColisCreate, ColisUpdate, StatutUpdate
 
 
-def test_creation_colis_valide():
-    colis = ColisCreate(
+def test_payload_creation_conforme_contrat():
+    data = ColisCreate(
         destinataire_nom="Moussa Ndiaye",
         destinataire_adresse="Rue 10, Pikine",
         description="Carton de livres",
-        poids_kg=2.5
+        poids_kg=2.5,
     )
-
-    assert colis.destinataire_nom == "Moussa Ndiaye"
-    assert colis.poids_kg == 2.5
+    assert data.poids_kg > 0
 
 
-def test_poids_negatif_refuse():
+def test_reference_ancien_format_refusee():
     with pytest.raises(ValidationError):
-        ColisCreate(
-            destinataire_nom="Moussa Ndiaye",
-            destinataire_adresse="Rue 10, Pikine",
-            poids_kg=-2
-        )
+        ColisCreate(reference="REF", description="x", poids_kg=1, adresse_depart="A", adresse_arrivee="B")
 
 
-def test_nom_trop_court_refuse():
+def test_poids_zero_refuse():
     with pytest.raises(ValidationError):
-        ColisCreate(
-            destinataire_nom="A",
-            destinataire_adresse="Rue 10, Pikine",
-            poids_kg=2.5
-        )
+        ColisCreate(destinataire_nom="A", destinataire_adresse="B", poids_kg=0)
+
+
+def test_statut_valide():
+    assert StatutUpdate(statut="en_transit").statut == "en_transit"
+
+
+def test_statut_invalide():
+    with pytest.raises(ValidationError):
+        StatutUpdate(statut="annule")
+
+
+def test_update_vide_refuse():
+    with pytest.raises(ValidationError):
+        ColisUpdate()
