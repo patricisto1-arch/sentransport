@@ -1,8 +1,9 @@
 """Modeles SQLAlchemy du service Colis, conformes a database/init.sql."""
+import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, Numeric, String, Text, func
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Numeric, String, Text, Uuid, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -14,7 +15,7 @@ class UtilisateurRef(Base):
     """Reference minimale a utilisateurs, table geree par le service Utilisateurs."""
     __tablename__ = "utilisateurs"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True)
 
 
 class Colis(Base):
@@ -25,13 +26,14 @@ class Colis(Base):
             "statut IN ('en_attente', 'en_transit', 'livre', 'echec')",
             name="ck_colis_statut_valide",
         ),
-        Index("idx_colis_expediteur_id", "expediteur_id"),
+        Index("idx_colis_client_id", "client_id"),
         Index("idx_colis_statut", "statut"),
     )
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    expediteur_id: Mapped[int] = mapped_column(
-        Integer,
+    id: Mapped[uuid.UUID] = mapped_column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    expediteur_id: Mapped[uuid.UUID] = mapped_column(
+        "client_id",
+        Uuid(as_uuid=True),
         ForeignKey("utilisateurs.id", ondelete="RESTRICT", onupdate="CASCADE"),
         nullable=False,
     )

@@ -1,5 +1,6 @@
 """Verification locale des JWT partages par les services SenTransport."""
 import os
+import uuid
 
 import jwt
 from fastapi import Depends, Header, HTTPException
@@ -26,13 +27,12 @@ def verifier_token(authorization: str | None = Header(default=None)) -> dict:
             algorithms=["HS256"],
             options={"require": ["sub", "role", "exp"]},
         )
-        # Le contrat transporte l'identifiant en texte dans sub, mais la BDD utilise INTEGER.
-        user_id = int(payload["sub"])
-        if user_id <= 0 or payload["role"] not in ROLES:
-            raise ValueError("Identifiant ou rôle invalide")
+        user_id = uuid.UUID(str(payload["sub"]))
+        if payload["role"] not in ROLES:
+            raise ValueError("Rôle invalide")
         payload["user_id"] = user_id
         return payload
-    except (jwt.InvalidTokenError, KeyError, TypeError, ValueError):
+    except (jwt.InvalidTokenError, KeyError, TypeError, ValueError, AttributeError):
         raise HTTPException(status_code=401, detail="Jeton invalide ou expiré")
 
 
