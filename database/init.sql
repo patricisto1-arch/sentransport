@@ -97,11 +97,11 @@ CREATE INDEX IF NOT EXISTS idx_historique_date_changement
 -- Le mot de passe est enregistré uniquement sous forme de hash Argon2id.
 INSERT INTO utilisateurs (nom, email, mot_de_passe_hash, role)
 VALUES
-    ('Client Démo', 'client.demo@sentransport.local',
+    ('Client Démo', 'client.demo@sentransport.sn',
      '$argon2id$v=19$m=65536,t=3,p=4$sdOCCHkhMq50gML3IQzl4A$ZDqJP6VSQUPobypC8xfpLIpPKTw/sjCYw04onmexcgk', 'client'),
-    ('Livreur Démo', 'livreur.demo@sentransport.local',
+    ('Livreur Démo', 'livreur.demo@sentransport.sn',
      '$argon2id$v=19$m=65536,t=3,p=4$sdOCCHkhMq50gML3IQzl4A$ZDqJP6VSQUPobypC8xfpLIpPKTw/sjCYw04onmexcgk', 'livreur'),
-    ('Administrateur Démo', 'admin.demo@sentransport.local',
+    ('Administrateur Démo', 'admin.demo@sentransport.sn',
      '$argon2id$v=19$m=65536,t=3,p=4$sdOCCHkhMq50gML3IQzl4A$ZDqJP6VSQUPobypC8xfpLIpPKTw/sjCYw04onmexcgk', 'admin')
 ON CONFLICT (email) DO NOTHING;
 
@@ -112,7 +112,7 @@ INSERT INTO colis (
 SELECT u.id, 'Moussa Ndiaye', 'Rue 10, Pikine',
        'Colis de démonstration', 2.50, 'en_attente'
 FROM utilisateurs AS u
-WHERE u.email = 'client.demo@sentransport.local'
+WHERE u.email = 'client.demo@sentransport.sn'
   AND NOT EXISTS (
       SELECT 1 FROM colis AS c WHERE c.description = 'Colis de démonstration'
   );
@@ -122,7 +122,7 @@ SELECT c.id, u.id, 'en_attente'
 FROM colis AS c
 CROSS JOIN utilisateurs AS u
 WHERE c.description = 'Colis de démonstration'
-  AND u.email = 'livreur.demo@sentransport.local'
+  AND u.email = 'livreur.demo@sentransport.sn'
   AND NOT EXISTS (SELECT 1 FROM livraisons AS l WHERE l.colis_id = c.id);
 
 INSERT INTO historique_livraisons (livraison_id, statut)
