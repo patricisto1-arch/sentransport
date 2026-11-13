@@ -5,16 +5,16 @@ import uuid
 os.environ.setdefault("DATABASE_URL", "sqlite:///./colis_test.db")
 os.environ.setdefault("JWT_SECRET", "secret-test")
 
-import jwt
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
+import jwt  # noqa: E402
+import pytest  # noqa: E402
+from fastapi.testclient import TestClient  # noqa: E402
+from sqlalchemy import create_engine, event  # noqa: E402
+from sqlalchemy.orm import sessionmaker  # noqa: E402
+from sqlalchemy.pool import StaticPool  # noqa: E402
 
-from app.database import get_db
-from app.models import Base, UtilisateurRef
-from main import app
+from app.database import get_db  # noqa: E402
+from app.models import Base, UtilisateurRef  # noqa: E402
+from main import app  # noqa: E402
 
 TEST_SECRET = "senTransport-test-secret-key-32-bytes-minimum"
 CLIENT_ID = uuid.UUID("11111111-1111-4111-8111-111111111111")
