@@ -1,4 +1,5 @@
 import os
+import uuid
 
 # La configuration SQLite est reservee aux tests locaux.
 os.environ.setdefault("DATABASE_URL", "sqlite:///./colis_test.db")
@@ -11,16 +12,15 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from app import auth
 from app.database import get_db
 from app.models import Base, UtilisateurRef
 from main import app
 
 TEST_SECRET = "senTransport-test-secret-key-32-bytes-minimum"
-CLIENT_ID = 1
-OTHER_CLIENT_ID = 2
-COURIER_ID = 3
-ADMIN_ID = 4
+CLIENT_ID = uuid.UUID("11111111-1111-4111-8111-111111111111")
+OTHER_CLIENT_ID = uuid.UUID("22222222-2222-4222-8222-222222222222")
+COURIER_ID = uuid.UUID("33333333-3333-4333-8333-333333333333")
+ADMIN_ID = uuid.UUID("44444444-4444-4444-8444-444444444444")
 
 
 @pytest.fixture
@@ -40,7 +40,10 @@ def db_engine():
     Base.metadata.create_all(engine)
     factory = sessionmaker(bind=engine, expire_on_commit=False)
     with factory() as session:
-        session.add_all(UtilisateurRef(id=i) for i in (CLIENT_ID, OTHER_CLIENT_ID, COURIER_ID, ADMIN_ID))
+        session.add_all(
+            UtilisateurRef(id=user_id)
+            for user_id in (CLIENT_ID, OTHER_CLIENT_ID, COURIER_ID, ADMIN_ID)
+        )
         session.commit()
     yield engine
     Base.metadata.drop_all(engine)

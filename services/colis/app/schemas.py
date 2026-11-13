@@ -1,4 +1,5 @@
 """Schemas HTTP conformes au contrat API SenTransport, section Colis."""
+import uuid
 from datetime import datetime
 from decimal import Decimal
 from typing import Annotated
@@ -47,8 +48,8 @@ class StatutUpdate(BaseModel):
 class ColisOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
-    expediteur_id: int
+    id: uuid.UUID
+    expediteur_id: uuid.UUID
     destinataire_nom: str
     destinataire_adresse: str
     description: str | None
