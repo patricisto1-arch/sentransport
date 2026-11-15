@@ -1,3 +1,4 @@
+# flake8: noqa: E402,F401
 import os
 
 # La configuration SQLite est reservee aux tests locaux.

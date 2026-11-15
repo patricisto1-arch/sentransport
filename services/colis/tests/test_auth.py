@@ -27,6 +27,6 @@ def test_sub_non_numerique_refuse(client, token):
 
 def test_token_expire_refuse(client):
     # exp volontairement dans le passe
-    expired = jwt.encode({"sub": "1", "role": "client", "exp": 1}, "senTransport-test-secret-key-32-bytes-minimum", algorithm="HS256")
+    expired = jwt.encode({"sub": "1", "role": "client", "exp": 1}, "senTransport-test-secret-key-32-bytes-minimum", algorithm="HS256")  # noqa: E501
     response = client.get("/", headers={"Authorization": f"Bearer {expired}"})
     assert response.status_code == 401

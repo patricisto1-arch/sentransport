@@ -24,6 +24,7 @@ from sqlalchemy import (
     func,
     select,
 )
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 from starlette.responses import JSONResponse
 

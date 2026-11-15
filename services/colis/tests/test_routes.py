@@ -1,6 +1,3 @@
-from decimal import Decimal
-
-
 def creer(client, headers, colis_payload, role="client", user_id=1):
     return client.post("/", json=colis_payload(), headers=headers(role, user_id))
 
