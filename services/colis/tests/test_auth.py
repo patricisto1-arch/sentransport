@@ -1,4 +1,4 @@
-import uuid
+﻿import uuid
 
 import jwt
 
@@ -19,7 +19,6 @@ def test_token_valide(client, headers):
 
 def test_token_sub_uuid_conserve(client, token):
     from app.auth import verifier_token
-    from fastapi import HTTPException
 
     encoded = token(user_id=CLIENT_ID)
     payload = verifier_token(f"Bearer {encoded}")

@@ -1,6 +1,4 @@
-import uuid
-
-from sqlalchemy import Uuid
+﻿from sqlalchemy import Uuid
 
 from app.models import Colis, UtilisateurRef
 
