@@ -30,47 +30,7 @@ interface UIState {
   ajouterNotification: (notification: Omit<NotificationApp, 'id' | 'date' | 'lu'>) => void;
 }
 
-const ilYA = (heures: number) =>
-  new Date(Date.now() - heures * 3600_000).toISOString();
-
-const notificationsInitiales: NotificationApp[] = [
-  {
-    id: 'n1',
-    titre: 'Colis ST-2026-00417 en transit',
-    texte: 'Votre colis a quitté le hub de Dakar en direction de Thiès.',
-    date: ilYA(0.4),
-    lu: false,
-    ton: 'accent',
-    href: '/colis/ST-2026-00417',
-  },
-  {
-    id: 'n2',
-    titre: 'Livraison confirmée',
-    texte: 'ST-2026-00402 a été remis à Fatou Ndiaye à Mbour.',
-    date: ilYA(3),
-    lu: false,
-    ton: 'success',
-    href: '/colis',
-  },
-  {
-    id: 'n3',
-    titre: 'Tournée modifiée',
-    texte: 'Modou Fall a récupéré 3 nouveaux colis pour la tournée de l’après-midi.',
-    date: ilYA(6),
-    lu: false,
-    ton: 'info',
-    href: '/livraisons',
-  },
-  {
-    id: 'n4',
-    titre: 'Échec de livraison',
-    texte: 'ST-2026-00388 : destinataire absent à Saint-Louis. Nouvelle tentative prévue.',
-    date: ilYA(26),
-    lu: true,
-    ton: 'warning',
-    href: '/colis',
-  },
-];
+const notificationsInitiales: NotificationApp[] = [];
 
 function appliquerTheme(theme: Theme) {
   if (typeof document === 'undefined') return;
@@ -124,6 +84,9 @@ export const useUIStore = create<UIState>()(
     }),
     {
       name: 'st.ui',
+      version: 2,
+      // v2 : on supprime les notifications de démonstration enregistrées par l'ancienne version.
+      migrate: (etat) => ({ ...(etat as Partial<UIState>), notifications: [] }) as UIState,
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         theme: state.theme,

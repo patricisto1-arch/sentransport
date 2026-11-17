@@ -228,10 +228,17 @@ function expeditieurAdresse(expediteur: Utilisateur | undefined, ville: string):
   };
 }
 
+export function libelleTournee(date: string) {
+  const jour = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' }).format(
+    new Date(date),
+  );
+  return `Tournée du ${jour}`;
+}
+
 export function versLivraison(
   dto: LivraisonDTO,
   numeroSuivi: string,
-  tournee = 'Tournée du jour',
+  tournee = libelleTournee(dto.created_at),
 ): Livraison {
   return {
     id: String(dto.id),
@@ -241,7 +248,6 @@ export function versLivraison(
     statut: statutDepuisContrat(dto.statut) as Livraison['statut'],
     dateAffectation: dto.created_at,
     dateLivraison: dto.statut === 'livre' ? dto.updated_at : undefined,
-    motifEchec: dto.statut === 'echec' ? 'Destinataire absent' : undefined,
     tournee,
   };
 }

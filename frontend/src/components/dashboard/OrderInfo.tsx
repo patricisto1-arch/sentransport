@@ -49,11 +49,14 @@ export function OrderInfo({
   colis,
   autresColis = [],
   livreur,
+  affecte = false,
   onChangerColis,
 }: {
   colis: Colis;
   autresColis?: Colis[];
   livreur?: { prenom: string; nom: string };
+  /** Un livreur est affecté, même si son nom n'est pas disponible (rôle client). */
+  affecte?: boolean;
   onChangerColis?: (id: string) => void;
 }) {
   const { t, langue } = useI18n();
@@ -131,7 +134,7 @@ export function OrderInfo({
               </span>
             </span>
             <p className="num mt-2 text-center text-[10px] font-medium text-ink-mute">
-              {nombre(colis.distanceKm, langue)} km
+              {colis.distanceKm > 0 ? `${nombre(colis.distanceKm, langue)} km` : '—'}
             </p>
           </div>
 
@@ -190,7 +193,7 @@ export function OrderInfo({
             {nombre(colis.poidsKg, langue, 1)} <span className="text-ink-mute">kg</span>
           </p>
           <p className="text-[11px] text-ink-mute">
-            {nombre(colis.prixFcfa, langue)} FCFA
+            {nombre(colis.prixFcfa, langue)} FCFA · {t('dash.estime')}
           </p>
         </BlocInfo>
 
@@ -202,6 +205,11 @@ export function OrderInfo({
                 {livreur.prenom} {livreur.nom}
               </span>
             </div>
+          ) : affecte ? (
+            <span className="flex items-center gap-1.5 text-[12px] font-semibold text-ink">
+              <Check aria-hidden className="h-3.5 w-3.5 text-success" />
+              {t('dash.livreur_affecte')}
+            </span>
           ) : (
             <span className="text-[12px] text-ink-mute">À affecter</span>
           )}
@@ -215,13 +223,15 @@ export function OrderInfo({
         >
           {t('dash.suivre')}
         </Link>
-        <a
-          href={`tel:${colis.destinataire.telephone.replace(/\s/g, '')}`}
-          className={buttonVariants({ variant: 'secondary', size: 'md', className: 'flex-1' })}
-        >
-          <Phone className="h-3.5 w-3.5" aria-hidden />
-          {t('dash.contacter')}
-        </a>
+        {colis.destinataire.telephone ? (
+          <a
+            href={`tel:${colis.destinataire.telephone.replace(/\s/g, '')}`}
+            className={buttonVariants({ variant: 'secondary', size: 'md', className: 'flex-1' })}
+          >
+            <Phone className="h-3.5 w-3.5" aria-hidden />
+            {t('dash.contacter')}
+          </a>
+        ) : null}
       </div>
     </SectionCard>
   );

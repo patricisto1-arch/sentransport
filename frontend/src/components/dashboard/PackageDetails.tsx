@@ -5,7 +5,7 @@ import { SectionCard } from '@/components/ui/Card';
 import { Avatar } from '@/components/ui/Avatar';
 import { StatutBadge } from '@/components/ui/Badge';
 import { ProgressFrise } from '@/components/ui/ProgressFrise';
-import { dateCourte } from '@/lib/format';
+import { adresseComplete, dateCourte } from '@/lib/format';
 import { useI18n } from '@/hooks/useI18n';
 
 export function PackageDetails({ colis }: { colis: Colis }) {
@@ -45,13 +45,15 @@ export function PackageDetails({ colis }: { colis: Colis }) {
             <p className="truncate text-[13px] font-semibold text-ink">
               {destinataire.nom}
             </p>
-            <p className="num text-[11px] text-ink-mute">{destinataire.telephone}</p>
+            {destinataire.telephone ? (
+              <p className="num text-[11px] text-ink-mute">{destinataire.telephone}</p>
+            ) : null}
           </div>
         </div>
         <div className="mt-3 flex items-start gap-1.5 text-[11px] leading-snug text-ink-soft">
           <MapPin aria-hidden className="mt-px h-3.5 w-3.5 shrink-0 text-ink-mute" />
           <span>
-            {destinataire.adresse}, {destinataire.ville}
+            {adresseComplete(destinataire.adresse, destinataire.ville)}
           </span>
         </div>
       </div>

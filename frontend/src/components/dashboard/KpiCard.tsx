@@ -97,7 +97,7 @@ export function KpiCard({
           <p className={cn('text-[11px] text-ink-mute', typeof variation === 'number' && 'mt-1.5')}>
             {typeof variation === 'number'
               ? t('kpi.vs_mois')
-              : (legende ?? t('kpi.vs_mois'))}
+              : (legende ?? t('kpi.sans_comparaison'))}
           </p>
         </div>
         <div

@@ -23,7 +23,7 @@ import { Textarea } from '@/components/ui/Input';
 import { EmptyState, ErrorState } from '@/components/ui/EmptyState';
 import { SkeletonTableau } from '@/components/ui/Skeleton';
 import { MapOverview } from '@/components/dashboard/MapOverview';
-import { heure } from '@/lib/format';
+import { adresseComplete, heure } from '@/lib/format';
 import { normaliserErreur } from '@/api/client';
 import { cn } from '@/lib/cn';
 
@@ -132,7 +132,7 @@ export function LivreurPage() {
     return (
       <div className="surface-card">
         <EmptyState
-          titre="Aucune tournée pour aujourd’hui"
+          titre="Aucune course affectée"
           texte="Les colis qui vous seront affectés apparaîtront ici avec les actions de statut."
           variante="carte"
         />
@@ -145,7 +145,7 @@ export function LivreurPage() {
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {[
           {
-            libelle: 'Courses du jour',
+            libelle: 'Courses affectées',
             valeur: stats.total,
             Icone: Package,
             ton: 'text-accent',
@@ -202,8 +202,7 @@ export function LivreurPage() {
                     <div>
                       <h2 className="text-[14px] font-semibold text-ink">{nom}</h2>
                       <p className="text-[10.5px] text-ink-mute">
-                        {courses.length} courses · {livrees} livrées ·{' '}
-                        {t('livreur.aujourdhui').toLowerCase()}
+                        {courses.length} courses · {livrees} livrées
                       </p>
                     </div>
                   </div>
@@ -250,7 +249,7 @@ export function LivreurPage() {
                               </p>
                               <p className="mt-0.5 text-[10.5px] text-ink-mute">
                                 {colis
-                                  ? `${colis.destinataire.adresse}, ${colis.destinataire.ville}`
+                                  ? adresseComplete(colis.destinataire.adresse, colis.destinataire.ville)
                                   : course.tournee}
                               </p>
                               {course.motifEchec ? (

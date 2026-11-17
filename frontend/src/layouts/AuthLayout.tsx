@@ -107,14 +107,14 @@ function PanneauIllustration() {
           </div>
         </div>
         <div className="mt-4 flex gap-1.5">
-          {['Enregistré', 'Pris en charge', 'En transit', 'Livré'].map((etape, index) => (
+          {['Enregistré', 'En transit', 'Livré'].map((etape, index) => (
             <div key={etape} className="flex-1">
               <div
-                className={`h-[3px] rounded-full ${index <= 2 ? 'bg-white' : 'bg-white/25'}`}
+                className={`h-[3px] rounded-full ${index <= 1 ? 'bg-white' : 'bg-white/25'}`}
               />
               <p
                 className={`mt-1.5 text-[8.5px] leading-tight ${
-                  index <= 2 ? 'font-medium text-white/80' : 'text-white/40'
+                  index <= 1 ? 'font-medium text-white/80' : 'text-white/40'
                 }`}
               >
                 {etape}

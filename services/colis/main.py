@@ -1,18 +1,22 @@
-"""Service Colis - SenTransport.
+"""Application FastAPI SenTransport - service Colis."""
+from fastapi import FastAPI, HTTPException
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
-Squelette : ajoutez vos routes ici en suivant docs/contrats-api.md.
-"""
-import os
+from app.database import engine
+from app.routes import router
 
-from fastapi import FastAPI
-
-app = FastAPI(title="SenTransport - Service Colis")
-
-DATABASE_URL = os.getenv("DATABASE_URL", "")
-JWT_SECRET = os.getenv("JWT_SECRET", "")
+app = FastAPI(title="SenTransport - Service Colis", version="2.0.0")
 
 
 @app.get("/health")
 def health():
-    """Utilisé par docker-compose et le déploiement pour vérifier l'état du service."""
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except SQLAlchemyError as exc:
+        raise HTTPException(status_code=503, detail="Base de données indisponible") from exc
     return {"status": "ok", "service": "colis"}
+
+
+app.include_router(router)
