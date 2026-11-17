@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from conftest import ADMIN_ID, CLIENT_ID, COURIER_ID, OTHER_CLIENT_ID
 
 
