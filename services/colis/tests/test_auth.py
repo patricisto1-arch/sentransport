@@ -1,5 +1,3 @@
-import uuid
-
 import jwt
 
 from conftest import CLIENT_ID
@@ -18,6 +16,7 @@ def test_token_valide(client, headers):
 
 
 def test_token_sub_uuid_conserve(client, token):
+    import uuid
     from app.auth import verifier_token
     from fastapi import HTTPException
 
