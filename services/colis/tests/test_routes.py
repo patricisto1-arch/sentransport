@@ -1,6 +1,4 @@
-from decimal import Decimal
-
-from conftest import CLIENT_ID, OTHER_CLIENT_ID, COURIER_ID, ADMIN_ID
+from conftest import ADMIN_ID, CLIENT_ID, COURIER_ID, OTHER_CLIENT_ID
 
 
 def creer(client, headers, colis_payload, role="client", user_id=CLIENT_ID):

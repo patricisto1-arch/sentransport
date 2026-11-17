@@ -20,25 +20,42 @@ export const VILLES: Ville[] = [
   { nom: 'Rufisque', code: 'RFQ', lat: 14.7167, lng: -17.2667 },
   { nom: 'Diourbel', code: 'DRB', lat: 14.6556, lng: -16.2314 },
   { nom: 'Kolda', code: 'KLD', lat: 12.8833, lng: -14.95 },
+  { nom: 'Pikine', code: 'PIK', lat: 14.7549, lng: -17.3985 },
+  { nom: 'Guédiawaye', code: 'GDW', lat: 14.7692, lng: -17.3882 },
+  { nom: 'Fatick', code: 'FTK', lat: 14.339, lng: -16.4111 },
+  { nom: 'Matam', code: 'MTM', lat: 15.6559, lng: -13.2554 },
 ];
 
 export const VILLES_NOMS = VILLES.map((v) => v.nom);
+
+/** Compare les noms de villes sans tenir compte des accents, de la casse ni des tirets. */
+export function normaliserVille(nom: string) {
+  return nom
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[-\s]+/g, ' ')
+    .trim()
+    .toLowerCase();
+}
 
 export function villeParCode(code: string) {
   return VILLES.find((v) => v.code === code);
 }
 
 export function villeParNom(nom: string) {
-  return VILLES.find((v) => v.nom.toLowerCase() === nom.toLowerCase());
+  const cle = normaliserVille(nom);
+  return VILLES.find((v) => normaliserVille(v.nom) === cle);
 }
 
 export function codeVille(nom: string) {
-  return villeParNom(nom)?.code ?? nom.slice(0, 3).toUpperCase();
+  return villeParNom(nom)?.code ?? normaliserVille(nom).slice(0, 3).toUpperCase();
 }
 
 /** Distances routières approximatives depuis Dakar (km). */
 export const DISTANCES_DEPUIS_DAKAR: Record<string, number> = {
   Dakar: 0,
+  Pikine: 15,
+  Guédiawaye: 18,
   Rufisque: 27,
   Thiès: 70,
   Mbour: 80,
@@ -54,9 +71,15 @@ export const DISTANCES_DEPUIS_DAKAR: Record<string, number> = {
   Matam: 504,
 };
 
+const DISTANCES_NORMALISEES: Record<string, number> = Object.fromEntries(
+  Object.entries(DISTANCES_DEPUIS_DAKAR).map(([ville, km]) => [normaliserVille(ville), km]),
+);
+
+/** Distance approximative en km, ou 0 si l'une des villes est inconnue. */
 export function distanceEntre(depart: string, arrivee: string) {
-  const a = DISTANCES_DEPUIS_DAKAR[depart] ?? 120;
-  const b = DISTANCES_DEPUIS_DAKAR[arrivee] ?? 150;
+  const a = DISTANCES_NORMALISEES[normaliserVille(depart)];
+  const b = DISTANCES_NORMALISEES[normaliserVille(arrivee)];
+  if (a === undefined || b === undefined) return 0;
   const valeur = Math.abs(a - b);
   return valeur === 0 ? 12 : valeur;
 }
@@ -73,14 +96,13 @@ export interface StatutMeta {
 export const STATUTS: Record<StatutColis, StatutMeta> = {
   en_attente: { cle: 'en_attente', ton: 'warning', etape: 0, progression: 12 },
   pris_en_charge: { cle: 'pris_en_charge', ton: 'info', etape: 1, progression: 40 },
-  en_transit: { cle: 'en_transit', ton: 'accent', etape: 2, progression: 72 },
-  livre: { cle: 'livre', ton: 'success', etape: 3, progression: 100 },
+  en_transit: { cle: 'en_transit', ton: 'accent', etape: 1, progression: 72 },
+  livre: { cle: 'livre', ton: 'success', etape: 2, progression: 100 },
   echec: { cle: 'echec', ton: 'danger', etape: 2, progression: 72 },
 };
 
 export const STATUTS_LISTE: StatutColis[] = [
   'en_attente',
-  'pris_en_charge',
   'en_transit',
   'livre',
   'echec',
@@ -88,7 +110,6 @@ export const STATUTS_LISTE: StatutColis[] = [
 
 export const ETAPES_SUIVI = [
   { statut: 'en_attente' as StatutColis, cle: 'etape.enregistre' },
-  { statut: 'pris_en_charge' as StatutColis, cle: 'etape.pris_en_charge' },
   { statut: 'en_transit' as StatutColis, cle: 'etape.en_transit' },
   { statut: 'livre' as StatutColis, cle: 'etape.livre' },
 ];
@@ -112,7 +133,7 @@ export const NAV_PRINCIPALE: NavItem[] = [
   { to: '/colis', cle: 'nav.colis', icone: 'colis' },
   { to: '/livraisons', cle: 'nav.livraisons', icone: 'livraisons' },
   { to: '/carte', cle: 'nav.carte', icone: 'carte' },
-  { to: '/messages', cle: 'nav.messages', icone: 'messages', badge: 3 },
+  { to: '/messages', cle: 'nav.messages', icone: 'messages' },
   { to: '/parametres', cle: 'nav.parametres', icone: 'parametres' },
 ];
 
@@ -124,7 +145,6 @@ export const NAV_ESPACE: NavItem[] = [
 export const FILTRES_STATUT = [
   'tous',
   'en_attente',
-  'pris_en_charge',
   'en_transit',
   'livre',
   'echec',

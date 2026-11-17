@@ -1,3 +1,4 @@
+import { normaliserVille } from './constants';
 /** Formatage FR — montants, dates, nombres, durée. */
 
 const LOCALES: Record<string, string> = { fr: 'fr-FR', en: 'en-GB' };
@@ -78,4 +79,10 @@ export function toDateTimeLocal(iso: string) {
   const offset = d.getTimezoneOffset();
   const local = new Date(d.getTime() - offset * 60000);
   return local.toISOString().slice(0, 16);
+}
+
+/** « Rue 10, Pikine » + « Pikine » → « Rue 10, Pikine » (la ville n'est pas répétée). */
+export function adresseComplete(adresse: string, ville: string) {
+  const dernier = adresse.split(',').pop()?.trim() ?? '';
+  return normaliserVille(dernier) === normaliserVille(ville) ? adresse : `${adresse}, ${ville}`;
 }

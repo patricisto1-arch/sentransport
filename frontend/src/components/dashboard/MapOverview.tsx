@@ -150,6 +150,15 @@ export function MapOverview({
   );
 
   const fraction = colis ? STATUTS[colis.statut].progression / 100 : 0.72;
+  const libelleTrajet =
+    colis?.statut === 'livre'
+      ? t('dash.trajet_livre')
+      : colis?.statut === 'echec'
+        ? t('dash.trajet_echec')
+        : colis?.statut === 'en_attente'
+          ? t('dash.trajet_attente')
+          : t('dash.trajet_en_cours');
+  const distanceAffichee = colis?.distanceKm ?? 70;
 
   useEffect(() => {
     if (!carte || !conteneurRef.current) return;
@@ -246,10 +255,10 @@ export function MapOverview({
 
         <div className="absolute bottom-3 left-3 z-[500] inline-flex items-center gap-2 rounded-pill bg-shell/95 px-3 py-1.5 text-[11px] font-medium text-ink shadow-card ring-1 ring-line/10 backdrop-blur">
           <span aria-hidden className="h-1.5 w-1.5 animate-pulse-soft rounded-full bg-accent" />
-          {t('dash.trajet_en_cours')}
-          <span className="num text-ink-mute">
-            {nombre(colis?.distanceKm ?? 70, langue)} km
-          </span>
+          {libelleTrajet}
+          {distanceAffichee > 0 ? (
+            <span className="num text-ink-mute">{nombre(distanceAffichee, langue)} km</span>
+          ) : null}
         </div>
 
         <div className="absolute right-3 top-3 z-[500] flex flex-col gap-1.5">

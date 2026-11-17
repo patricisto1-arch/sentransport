@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Eye, EyeOff, Lock, Mail, Phone, Truck, UserRound } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, Phone } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useInscription } from '@/api/hooks/users';
@@ -12,7 +12,6 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { VILLES_NOMS } from '@/lib/constants';
-import { cn } from '@/lib/cn';
 import { normaliserErreur } from '@/api/client';
 import { schemaInscription, type DonneesInscription } from './schemas';
 
@@ -27,7 +26,6 @@ export function RegisterForm() {
   const {
     register,
     handleSubmit,
-    watch,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<DonneesInscription>({
@@ -43,7 +41,6 @@ export function RegisterForm() {
     },
   });
 
-  const role = watch('role');
 
   const envoyer = handleSubmit(async (donnees) => {
     try {
@@ -129,53 +126,6 @@ export function RegisterForm() {
           />
         </div>
 
-        <fieldset>
-          <legend className="mb-1.5 text-[13px] font-medium text-ink-soft">
-            {t('register.role')}
-          </legend>
-          <div className="grid grid-cols-2 gap-2">
-            {(
-              [
-                { valeur: 'client', label: t('role.client'), Icone: UserRound },
-                { valeur: 'livreur', label: t('role.livreur'), Icone: Truck },
-              ] as const
-            ).map(({ valeur, label, Icone }) => {
-              const actif = role === valeur;
-              return (
-                <label
-                  key={valeur}
-                  className={cn(
-                    'flex cursor-pointer items-center gap-2.5 rounded-[14px] border p-3 transition-colors focus-within:ring-2 focus-within:ring-accent',
-                    actif
-                      ? 'border-accent/40 bg-accent-soft text-accent-deep'
-                      : 'border-line/10 bg-shell text-ink-soft hover:bg-surface',
-                  )}
-                >
-                  <input
-                    type="radio"
-                    value={valeur}
-                    className="sr-only"
-                    {...register('role')}
-                  />
-                  <span
-                    className={cn(
-                      'grid h-8 w-8 place-items-center rounded-full',
-                      actif ? 'bg-accent text-white' : 'bg-surface text-ink-soft',
-                    )}
-                  >
-                    <Icone aria-hidden className="h-4 w-4" />
-                  </span>
-                  <span className="text-[12.5px] font-semibold">{label}</span>
-                </label>
-              );
-            })}
-          </div>
-          {errors.role?.message ? (
-            <p role="alert" className="mt-1.5 text-xs font-medium text-danger">
-              {errors.role.message}
-            </p>
-          ) : null}
-        </fieldset>
 
         <div>
           <Input
@@ -238,9 +188,9 @@ export function RegisterForm() {
 
       <div className="mt-6 rounded-[16px] border border-line/[0.07] bg-surface px-3.5 py-3">
         <p className="text-[11px] leading-relaxed text-ink-soft">
-          <span className="font-semibold text-ink">Astuce :</span> un compte livreur
-          donne accès aux tournées du jour et aux actions de statut. Un compte client
-          permet de créer et suivre vos colis.
+          <span className="font-semibold text-ink">Bon à savoir :</span> l’inscription crée
+          un compte client, pour créer et suivre vos colis. Les comptes livreur et
+          administrateur ne peuvent pas être créés depuis cette page.
         </p>
       </div>
     </div>

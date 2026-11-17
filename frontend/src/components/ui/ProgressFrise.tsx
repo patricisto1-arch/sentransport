@@ -15,14 +15,17 @@ export function ProgressFrise({
   const reduit = useReducedMotion();
   const meta = STATUTS[statut];
   const etape = meta.etape;
-  const largeurRemplie = (etape / (ETAPES_SUIVI.length - 1)) * 75;
+  const nombreEtapes = ETAPES_SUIVI.length;
+  const marge = 50 / nombreEtapes;
+  const largeurRemplie = (etape / (nombreEtapes - 1)) * (100 - 2 * marge);
 
   return (
     <div className="w-full">
       <div className="relative">
         <span
           aria-hidden
-          className="absolute left-[12.5%] right-[12.5%] top-[9px] h-[3px] rounded-full bg-line/[0.08] dark:bg-white/10"
+          style={{ left: `${marge}%`, right: `${marge}%` }}
+          className="absolute top-[9px] h-[3px] rounded-full bg-line/[0.08] dark:bg-white/10"
         />
         <motion.span
           aria-hidden
@@ -33,8 +36,9 @@ export function ProgressFrise({
             ease: [0.22, 1, 0.36, 1],
             delay: 0.15,
           }}
+          style={{ left: `${marge}%` }}
           className={cn(
-            'absolute left-[12.5%] top-[9px] h-[3px] rounded-full',
+            'absolute top-[9px] h-[3px] rounded-full',
             statut === 'echec' ? 'bg-danger' : 'bg-accent',
           )}
         />
@@ -73,7 +77,9 @@ export function ProgressFrise({
                     index <= etape ? 'font-semibold text-ink' : 'text-ink-mute',
                   )}
                 >
-                  {t(etapeSuivi.cle as 'etape.enregistre')}
+                  {statut === 'echec' && index === nombreEtapes - 1
+                    ? t('statut.echec')
+                    : t(etapeSuivi.cle as 'etape.enregistre')}
                 </span>
               </div>
             );
@@ -81,7 +87,7 @@ export function ProgressFrise({
         </div>
       </div>
       <span className="sr-only">
-        Étape actuelle : {t(`statut.${statut}`)} ({etape + 1} sur 4)
+        Étape actuelle : {t(`statut.${statut}`)} ({etape + 1} sur {nombreEtapes})
       </span>
     </div>
   );

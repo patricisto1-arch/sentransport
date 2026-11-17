@@ -5,3 +5,14 @@ __pycache__/
 .pytest_cache/
 .coverage
 *.db
+node_modules/
+dist/
+*.tsbuildinfo
+login.json
+*.patch
+*.zip
+tmp_*.db
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -40,6 +40,7 @@ def test_sub_non_uuid_refuse(client, token):
 
 
 def test_token_expire_refuse(client):
+    # exp volontairement dans le passe avec le bon format de sub et la clef de test
     expired = jwt.encode(
         {"sub": str(CLIENT_ID), "role": "client", "exp": 1},
         "senTransport-test-secret-key-32-bytes-minimum",

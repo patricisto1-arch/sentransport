@@ -5,7 +5,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { StatutBadge } from '@/components/ui/Badge';
 import { codeVille } from '@/lib/constants';
-import { dateCourte, nombre } from '@/lib/format';
+import { adresseComplete, dateCourte, nombre } from '@/lib/format';
 import { useI18n } from '@/hooks/useI18n';
 
 export function BordereauModal({
@@ -108,7 +108,7 @@ export function BordereauModal({
               <p className="mt-1 text-[11.5px] font-semibold">{bloc.data.nom}</p>
               <p className="num text-[10px] text-[#6B6880]">{bloc.data.telephone}</p>
               <p className="mt-0.5 text-[10px] leading-snug text-[#6B6880]">
-                {bloc.data.adresse}, {bloc.data.ville}
+                {adresseComplete(bloc.data.adresse, bloc.data.ville)}
               </p>
             </div>
           ))}
