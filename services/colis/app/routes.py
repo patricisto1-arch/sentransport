@@ -1,4 +1,6 @@
 """Routes du service Colis conformes a la section 5 du contrat API."""
+import uuid
+
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -20,7 +22,7 @@ TRANSITIONS = {
 }
 
 
-def _get_colis(colis_id: int, user: dict, db: Session) -> Colis:
+def _get_colis(colis_id: uuid.UUID, user: dict, db: Session) -> Colis:
     colis = db.get(Colis, colis_id)
     if colis is None:
         raise HTTPException(status_code=404, detail="Colis introuvable")
@@ -60,7 +62,7 @@ def lister_colis(
 
 @router.get("/{colis_id}", response_model=ColisOut)
 def detail_colis(
-    colis_id: int,
+    colis_id: uuid.UUID,
     user: dict = Depends(verifier_role("client", "livreur", "admin")),
     db: Session = Depends(get_db),
 ):
@@ -69,7 +71,7 @@ def detail_colis(
 
 @router.put("/{colis_id}", response_model=ColisOut)
 def modifier_colis(
-    colis_id: int,
+    colis_id: uuid.UUID,
     data: ColisUpdate,
     user: dict = Depends(verifier_role("client", "admin")),
     db: Session = Depends(get_db),
@@ -90,7 +92,7 @@ def modifier_colis(
 
 @router.delete("/{colis_id}", status_code=status.HTTP_204_NO_CONTENT)
 def supprimer_colis(
-    colis_id: int,
+    colis_id: uuid.UUID,
     user: dict = Depends(verifier_role("admin")),
     db: Session = Depends(get_db),
 ):
@@ -108,7 +110,7 @@ def supprimer_colis(
 
 @router.patch("/{colis_id}/statut", response_model=ColisOut)
 def modifier_statut(
-    colis_id: int,
+    colis_id: uuid.UUID,
     data: StatutUpdate,
     user: dict = Depends(verifier_role("livreur", "admin")),
     db: Session = Depends(get_db),
