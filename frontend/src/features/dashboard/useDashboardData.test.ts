@@ -30,3 +30,10 @@ describe('calculerDashboard', () => {
     );
   });
 });
+
+describe('ponctualité sans livraison', () => {
+  it('vaut null tant qu’aucun colis n’est livré', () => {
+    const sansLivre = COLIS.filter((c) => c.statut !== 'livre');
+    expect(calculerDashboard(sansLivre, 'fr').ponctualite).toBeNull();
+  });
+});

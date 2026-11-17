@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Package, Plus, Route, Scale } from 'lucide-react';
 import { useDashboardData } from '@/features/dashboard/useDashboardData';
 import { useUtilisateurs } from '@/api/hooks/users';
+import { useLivraisons } from '@/api/hooks/livraisons';
 import { KpiCard } from '@/components/dashboard/KpiCard';
 import { MiniArea, MiniBars } from '@/components/dashboard/MiniChart';
 import { PackageDetails } from '@/components/dashboard/PackageDetails';
@@ -42,6 +43,7 @@ export function DashboardPage() {
   const { t, langue } = useI18n();
   const { donnees, isLoading, isError, error, refetch } = useDashboardData();
   const { data: livreurs } = useUtilisateurs('livreur');
+  const { data: livraisons } = useLivraisons();
   const role = useAuthStore((s) => s.utilisateur?.role);
   const [selectionId, setSelectionId] = useState<string | null>(null);
 
@@ -104,7 +106,9 @@ export function DashboardPage() {
 
   const featured =
     donnees.colis.find((c) => c.id === selectionId) ?? donnees.featured;
-  const livreur = livreurs?.find((l) => l.id === featured?.livreurId);
+  const livraisonDuColis = livraisons?.find((l) => l.colisId === featured?.id);
+  const livreur = livreurs?.find((l) => l.id === livraisonDuColis?.livreurId);
+  const affecte = Boolean(livraisonDuColis);
   const autresColis = donnees.colis.filter((c) => c.id !== featured?.id).slice(0, 10);
 
   return (
@@ -157,6 +161,7 @@ export function DashboardPage() {
                 livreur={
                   livreur ? { prenom: livreur.prenom, nom: livreur.nom } : undefined
                 }
+                affecte={affecte}
                 onChangerColis={(id) => setSelectionId(id)}
               />
             ) : null}
@@ -188,8 +193,11 @@ export function DashboardPage() {
                   {t('dash.vehicule')}
                 </h2>
                 <p className="text-[12px] text-ink-soft">
-                  Aucun livreur n’est encore affecté à ce colis. L’affectation se fait
-                  depuis l’espace administration.
+                  {affecte
+                    ? t('dash.livreur_affecte_texte')
+                    : role === 'administrateur'
+                      ? t('dash.livreur_admin')
+                      : t('dash.livreur_a_venir')}
                 </p>
               </section>
             )}

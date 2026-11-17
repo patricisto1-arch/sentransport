@@ -41,7 +41,8 @@ export interface DashboardData {
     poids: PointMini[];
     distance: PointMini[];
   };
-  ponctualite: number;
+  /** `null` tant qu'aucun colis n'a été livré. */
+  ponctualite: number | null;
   aLheure: number;
   enRetard: number;
   colisActifs: number;
@@ -63,7 +64,7 @@ export function calculerDashboard(colis: Colis[], langue: string): DashboardData
   );
 
   const poidsMoyen = moyenne(duMois.map((c) => c.poidsKg));
-  const distanceMoyenne = moyenne(duMois.map((c) => c.distanceKm));
+  const distanceMoyenne = moyenne(duMois.map((c) => c.distanceKm).filter((km) => km > 0));
 
   const formateurJour = new Intl.DateTimeFormat(
     langue === 'fr' ? 'fr-FR' : 'en-GB',
@@ -102,13 +103,7 @@ export function calculerDashboard(colis: Colis[], langue: string): DashboardData
   ).length;
   const enRetard = livres.length - aLheure;
   const ponctualite =
-    livres.length > 0
-      ? Math.round((aLheure / livres.length) * 100)
-      : Math.round(
-          (colis.filter((c) => +new Date(c.dateLivraisonPrevue) >= +maintenant).length /
-            Math.max(1, colis.length)) *
-            100,
-        );
+    livres.length > 0 ? Math.round((aLheure / livres.length) * 100) : null;
 
   const actifs = colis.filter(
     (c) => c.statut !== 'livre' && c.statut !== 'echec',
@@ -132,7 +127,7 @@ export function calculerDashboard(colis: Colis[], langue: string): DashboardData
       ),
       distance: evolution(
         distanceMoyenne,
-        moyenne(duMoisPrecedent.map((c) => c.distanceKm)),
+        moyenne(duMoisPrecedent.map((c) => c.distanceKm).filter((km) => km > 0)),
       ),
     },
     series: {

@@ -34,7 +34,7 @@ import { MapOverview } from '@/components/dashboard/MapOverview';
 import { BordereauModal } from '@/features/colis/BordereauModal';
 import { ColisEditModal } from '@/features/colis/ColisEditModal';
 import { codeVille } from '@/lib/constants';
-import { dateHeure, dateLongue, heure, nombre } from '@/lib/format';
+import { adresseComplete, dateHeure, dateLongue, heure, nombre } from '@/lib/format';
 import type { StatutColis } from '@/api/types';
 import { cn } from '@/lib/cn';
 
@@ -372,7 +372,7 @@ export function ColisDetailPage() {
                   <p className="mt-2 text-[13px] font-semibold text-ink">{data.nom}</p>
                   <p className="num text-[11px] text-ink-mute">{data.telephone}</p>
                   <p className="mt-1.5 text-[11px] leading-snug text-ink-soft">
-                    {data.adresse}, {data.ville}
+                    {adresseComplete(data.adresse, data.ville)}
                   </p>
                 </div>
               ))}

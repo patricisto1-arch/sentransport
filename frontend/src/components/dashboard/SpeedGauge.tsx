@@ -32,13 +32,15 @@ export function SpeedGauge({
   aLheure,
   enRetard,
 }: {
-  pourcentage: number;
+  pourcentage: number | null;
   aLheure: number;
   enRetard: number;
 }) {
   const { t, langue } = useI18n();
   const reduit = useReducedMotion();
-  const remplis = Math.round((Math.min(100, Math.max(0, pourcentage)) / 100) * SEGMENTS);
+  const aucune = pourcentage === null;
+  const valeur = pourcentage ?? 0;
+  const remplis = Math.round((Math.min(100, Math.max(0, valeur)) / 100) * SEGMENTS);
 
   return (
     <SectionCard
@@ -52,7 +54,11 @@ export function SpeedGauge({
           viewBox="0 0 220 220"
           className="w-full"
           role="img"
-          aria-label={`${t('dash.ponctualite')} : ${pourcentage} %. ${aLheure} ${t('dash.a_lheure')}, ${enRetard} ${t('dash.en_retard')}.`}
+          aria-label={
+            aucune
+              ? `${t('dash.ponctualite')} : ${t('dash.ponctualite_na')}.`
+              : `${t('dash.ponctualite')} : ${valeur} %. ${aLheure} ${t('dash.a_lheure')}, ${enRetard} ${t('dash.en_retard')}.`
+          }
         >
           {ARCS.map((chemin, index) => {
             const actif = index < remplis;
@@ -86,8 +92,14 @@ export function SpeedGauge({
         </svg>
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pt-2">
           <p className="flex items-start gap-0.5 text-[42px] font-semibold leading-none tracking-[-0.05em] text-ink">
-            <Counter valeur={pourcentage} langue={langue} />
-            <span className="mt-1.5 text-base font-medium tracking-normal text-ink-mute">%</span>
+            {aucune ? (
+              <span aria-hidden>—</span>
+            ) : (
+              <>
+                <Counter valeur={valeur} langue={langue} />
+                <span className="mt-1.5 text-base font-medium tracking-normal text-ink-mute">%</span>
+              </>
+            )}
           </p>
           <p className="mt-1 text-[11px] font-medium text-ink-mute">
             {t('dash.ponctualite')}
@@ -114,14 +126,14 @@ export function SpeedGauge({
       >
         <motion.span
           initial={{ width: 0 }}
-          animate={{ width: `${pourcentage}%` }}
+          animate={{ width: `${valeur}%` }}
           transition={{ duration: reduit ? 0 : 1, delay: reduit ? 0 : 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="h-full rounded-pill bg-accent"
         />
-        <span className="h-full flex-1 rounded-pill bg-warning/70" />
+        {aucune ? null : <span className="h-full flex-1 rounded-pill bg-warning/70" />}
       </div>
       <p className="text-center text-[11px] text-ink-mute">
-        {aLheure + enRetard} {t('dash.colis_livres')}
+        {aucune ? t('dash.ponctualite_na') : `${aLheure + enRetard} ${t('dash.colis_livres')}`}
       </p>
     </SectionCard>
   );

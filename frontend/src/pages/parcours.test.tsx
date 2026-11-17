@@ -8,6 +8,8 @@ import { AppShell } from '@/layouts/AppShell';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { creerClientDeTest } from '@/tests/render';
 import { useAuthStore } from '@/store/auth';
+import { useUIStore } from '@/store/ui';
+import { toDateTimeLocal } from '@/lib/format';
 import { UTILISATEURS } from '@/mocks/data';
 import type { Utilisateur } from '@/api/types';
 import { App } from '@/App';
@@ -162,7 +164,8 @@ describe('Parcours client', () => {
     await utilisateur.clear(screen.getByLabelText(/^Livraison estimée/));
     await utilisateur.type(
       screen.getByLabelText(/^Livraison estimée/),
-      '2026-11-12T10:30',
+      // Date toujours dans le futur : le formulaire refuse une livraison déjà passée.
+      toDateTimeLocal(new Date(Date.now() + 3 * 86_400_000).toISOString()),
     );
     await utilisateur.selectOptions(screen.getByLabelText(/^Ville de départ/), 'Dakar');
     await utilisateur.selectOptions(screen.getByLabelText(/^Ville d’arrivée/), 'Thiès');
@@ -222,6 +225,12 @@ describe('Parcours client', () => {
 
   it('affiche et filtre les messages', async () => {
     const utilisateur = userEvent.setup();
+    useUIStore.getState().ajouterNotification({
+      titre: 'Colis ST-2026-00417 en transit',
+      texte: 'Votre colis a quitté le hub de Dakar.',
+      ton: 'accent',
+      href: '/colis',
+    });
     afficherPage('/messages', <MessagesPage />, { utilisateur: CLIENT });
 
     expect(await screen.findByText(/Colis ST-2026-00417 en transit/)).toBeInTheDocument();
@@ -253,7 +262,7 @@ describe('Parcours livreur et administrateur', () => {
     afficherPage('/livreur', <LivreurPage />, { utilisateur: LIVREUR });
 
     expect(await screen.findByRole('heading', { name: 'Mes tournées' })).toBeInTheDocument();
-    expect(await screen.findByText('Tournée du jour')).toBeInTheDocument();
+    expect((await screen.findAllByText(/^Tournée du \d/)).length).toBeGreaterThan(0);
 
     await utilisateur.click(screen.getAllByRole('button', { name: 'Échec' })[0] as HTMLElement);
     const modale = await screen.findByRole('dialog');
